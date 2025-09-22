@@ -1,5 +1,7 @@
 <?php
 session_start();
+include("includes/header.php");
+
 include("includes/db.php");
 
 // Fetch products
@@ -157,3 +159,5 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
 
 </body>
 </html>
+
+<?php include("includes/footer.php"); ?>

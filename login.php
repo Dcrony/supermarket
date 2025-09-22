@@ -2,6 +2,7 @@
 session_start();
 include("includes/db.php");
 
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $username = $_POST['username'];
     $password = md5($_POST['password']);
@@ -41,3 +42,5 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   </form>
 </body>
 </html>
+
+<?php include("includes/footer.php"); ?>

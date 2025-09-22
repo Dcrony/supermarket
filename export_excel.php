@@ -1,6 +1,7 @@
 <?php
 include("includes/db.php");
 
+
 // Apply same filter logic
 $where = "";
 if (isset($_GET['filter'])) {
