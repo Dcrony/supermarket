@@ -24,6 +24,7 @@ if (session_status() == PHP_SESSION_NONE) {
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item"><a class="nav-link" href="dashboard.php">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="sales.php">Sales</a></li>
             <li class="nav-item"><a class="nav-link" href="sales_report.php">Sales Report</a></li>
             <li class="nav-item"><a class="nav-link" href="products.php">Products</a></li>
 
@@ -36,7 +37,8 @@ if (session_status() == PHP_SESSION_NONE) {
             <!-- Profile & Settings dropdown -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                <i class="bi bi-person-circle"></i> <?= $_SESSION['name'] ?? "User"; ?>
+                <i class="bi bi-person-circle me-1"></i> 
+                <?= $_SESSION['username'] ?? "User"; ?>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="profile.php">Profile</a></li>
