@@ -82,14 +82,14 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
   <title>POS - Supermarket</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="container mt-4">
-  <h2>Supermarket POS</h2>
+<body class="">
+  <h2>Point of Sales (POS)</h2>
 
   <?php if (!empty($success)) echo "<div class='alert alert-success'>$success</div>"; ?>
 
   <!-- Add to Cart -->
-  <form method="POST" class="row g-3 mb-4">
-    <div class="col-md-6">
+  <form method="POST" class="row g-3 mb-4 mt-4">
+    <div class=" col-md-6">
       <label class="form-label">Product</label>
       <select name="product_id" class="form-control" required>
         <option value="">-- Select Product --</option>
@@ -104,6 +104,7 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
       <label class="form-label">Quantity</label>
       <input type="number" name="quantity" class="form-control" min="1" required>
     </div>
+    
     <div class="col-md-3 d-flex align-items-end">
       <button type="submit" name="add_to_cart" class="btn btn-primary w-100">Add to Cart</button>
     </div>

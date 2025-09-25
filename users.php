@@ -18,7 +18,10 @@ $result = $conn->query("SELECT * FROM users ORDER BY id DESC");
 
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h3><i class="bi bi-people-fill"></i> Manage Users</h3>
-  <a href="user_add.php" class="btn btn-success"><i class="bi bi-person-plus"></i> Add Cashier</a>
+  <div>
+    <a href="cashiers.php" class="btn btn-warning"><i class="bi bi-person-plus"></i>Cashiers</a>
+  <a href="user_add.php" class="btn btn-success"><i class="bi bi-person-plus"></i>+ Add user</a>
+  </div>
 </div>
 
 <div class="card shadow-sm">

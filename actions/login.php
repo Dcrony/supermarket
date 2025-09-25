@@ -15,6 +15,6 @@ if ($result->num_rows > 0) {
     $_SESSION['role'] = $user['role'];
     header("Location: ../dashboard.php");
 } else {
-    echo "<script>alert('Invalid email or password'); window.location='../index.php';</script>";
+    echo "<script>alert('Invalid email or password'); window.location='../login.php';</script>";
 }
 ?>

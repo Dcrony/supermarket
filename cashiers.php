@@ -15,7 +15,7 @@ $result = $conn->query("SELECT * FROM users WHERE role='cashier' ORDER BY id DES
 
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h3>Manage Cashiers</h3>
-  <a href="cashier_add.php" class="btn btn-success">+ Add Cashier</a>
+  <a href="user_add.php" class="btn btn-success">+ Add Cashier</a>
 </div>
 
 <table class="table table-bordered table-striped shadow-sm">
@@ -38,7 +38,7 @@ $result = $conn->query("SELECT * FROM users WHERE role='cashier' ORDER BY id DES
         <td><?= $row['email']; ?></td>
         <td><?= $row['created_at']; ?></td>
         <td>
-          <a href="cashier_edit.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
+          <a href="user_edit.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
           <a href="actions/cashier_delete.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
         </td>
       </tr>

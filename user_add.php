@@ -7,7 +7,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $username = $_POST['username'];
     $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+    $password = md5($_POST['password']);
     $role = $_POST['role'];
 
     $conn->query("INSERT INTO users (name, username, email, password, role) 

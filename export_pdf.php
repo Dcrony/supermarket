@@ -25,7 +25,7 @@ $pdf->SetFont("Arial", "", 11);
 $sales = $conn->query("
     SELECT s.id, s.total, s.created_at, u.username AS cashier 
     FROM sales s 
-    LEFT JOIN users u ON s.cashier_id = u.id 
+    LEFT JOIN users u ON s.user_id = u.id 
     ORDER BY s.created_at DESC
 ");
 

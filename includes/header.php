@@ -24,13 +24,14 @@ if (session_status() == PHP_SESSION_NONE) {
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item"><a class="nav-link" href="dashboard.php">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="sales.php">Sales</a></li>
+             <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'cashier') { ?>
+                          <li class="nav-item"><a class="nav-link" href="pos.php">Sales</a></li>
+
+            <?php } ?>
             <li class="nav-item"><a class="nav-link" href="sales_report.php">Sales Report</a></li>
             <li class="nav-item"><a class="nav-link" href="products.php">Products</a></li>
 
             <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') { ?>
-              <!-- Admin-only links -->
-              <li class="nav-item"><a class="nav-link" href="cashiers.php">Manage Cashiers</a></li>
               <li class="nav-item"><a class="nav-link" href="users.php">Manage Users</a></li>
             <?php } ?>
 

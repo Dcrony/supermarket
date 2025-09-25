@@ -112,7 +112,7 @@ $recent_sales = $conn->query("
               <div class="d-flex justify-content-between align-items-center">
                   <div>
                       <h6>Today’s Revenue</h6>
-                      <h3>$<?= number_format($today_revenue, 2); ?></h3>
+                      <h3>₦<?= number_format($today_revenue, 2); ?></h3>
                   </div>
                   <i class="bi bi-cash-stack stat-icon"></i>
               </div>
@@ -140,7 +140,7 @@ $recent_sales = $conn->query("
                       <tr>
                           <td>#<?= $row['id']; ?></td>
                           <td><?= $row['name'] ?? "Unknown"; ?></td>
-                          <td><span class="badge bg-success">$<?= number_format($row['total'], 2); ?></span></td>
+                          <td><span class="badge bg-success">₦<?= number_format($row['total'], 2); ?></span></td>
                           <td><?= date("d M Y, h:i A", strtotime($row['created_at'])); ?></td>
                       </tr>
                   <?php } ?>

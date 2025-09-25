@@ -3,7 +3,7 @@ session_start();
 include("../includes/db.php");
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    $cashier_id = $_SESSION['user_id'] ?? 1; // fallback for testing
+    $cashier_id = $_SESSION['user_id'] ?? 1; 
     $total = $_POST['total'];
 
     // Insert sale
