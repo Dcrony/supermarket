@@ -1,5 +1,4 @@
 <?php 
-
 include("includes/db.php");
 
 // Fetch stats
@@ -25,6 +24,9 @@ $recent_sales = $conn->query("
     ORDER BY s.created_at DESC
     LIMIT 5
 ");
+
+// Low stock check (you can adjust the threshold, e.g., 5 items)
+$low_stock = $conn->query("SELECT name, stock FROM products WHERE stock < 5 ORDER BY stock ASC");
 ?>
 
 <!DOCTYPE html>
@@ -33,6 +35,7 @@ $recent_sales = $conn->query("
   <meta charset="UTF-8">
   <title>POS Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     body {
       background-color: #f8f9fa;
@@ -70,6 +73,18 @@ $recent_sales = $conn->query("
     <h1 class="fw-bold">Supermarket POS Dashboard</h1>
     <p class="mb-0">Manage sales, products, and reports at a glance</p>
   </div>
+
+  <!-- Low Stock Alert -->
+  <?php if ($low_stock->num_rows > 0) { ?>
+    <div class="alert alert-warning shadow-sm">
+      <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Low Stock Alert!</h5>
+      <ul class="mb-0">
+        <?php while ($row = $low_stock->fetch_assoc()) { ?>
+          <li><strong><?= $row['name']; ?></strong> has only <span class="badge bg-danger"><?= $row['stock']; ?></span> left in stock.</li>
+        <?php } ?>
+      </ul>
+    </div>
+  <?php } ?>
 
   <!-- Stats Cards -->
   <div class="row g-4">
@@ -151,6 +166,5 @@ $recent_sales = $conn->query("
 
 </body>
 </html>
-
 
 <?php include("includes/footer.php"); ?>

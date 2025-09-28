@@ -32,7 +32,7 @@ $sales = $conn->query("
 while ($row = $sales->fetch_assoc()) {
     $pdf->Cell(20, 10, $row['id'], 1);
     $pdf->Cell(50, 10, $row['cashier'] ?? "Unknown", 1);
-    $pdf->Cell(40, 10, "$" . number_format($row['total'], 2), 1);
+    $pdf->Cell(40, 10, "₦" . number_format($row['total'], 2), 1);
     $pdf->Cell(60, 10, $row['created_at'], 1);
     $pdf->Ln();
 }

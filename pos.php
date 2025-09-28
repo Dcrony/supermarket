@@ -69,6 +69,7 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
     $_SESSION['cart'] = []; // clear cart
 
     // Redirect to receipt page
+    $success = "Sale completed successfully!";
     header("Location: receipt.php?id=" . $sale_id);
     exit;
 }
@@ -96,7 +97,7 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
         <?php 
         $products->data_seek(0);
         while ($row = $products->fetch_assoc()) { ?>
-          <option value="<?= $row['id'] ?>"><?= $row['name'] ?> ($<?= $row['price'] ?>)</option>
+          <option value="<?= $row['id'] ?>"><?= $row['name'] ?> (₦<?= $row['price'] ?>)</option>
         <?php } ?>
       </select>
     </div>
@@ -133,9 +134,9 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
         <tr>
           <td><?= $index + 1 ?></td>
           <td><?= $item['name'] ?></td>
-          <td>$<?= number_format($item['price'], 2) ?></td>
+          <td>₦<?= number_format($item['price'], 2) ?></td>
           <td><?= $item['quantity'] ?></td>
-          <td>$<?= number_format($subtotal, 2) ?></td>
+          <td>₦<?= number_format($subtotal, 2) ?></td>
           <td>
             <a href="?remove=<?= $index ?>" class="btn btn-danger btn-sm">Remove</a>
           </td>
@@ -143,7 +144,7 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
       <?php } ?>
       <tr>
         <td colspan="4" class="text-end"><strong>Total:</strong></td>
-        <td colspan="2"><strong>$<?= number_format($grand_total, 2) ?></strong></td>
+        <td colspan="2"><strong>₦<?= number_format($grand_total, 2) ?></strong></td>
       </tr>
     </tbody>
   </table>

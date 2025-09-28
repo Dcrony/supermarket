@@ -77,7 +77,7 @@ $result = $conn->query("SELECT * FROM products ORDER BY id DESC");
               <td><span class="badge bg-dark">#<?= $row['id']; ?></span></td>
               <td><?= $row['name']; ?></td>
               <td><span class="badge bg-info"><?= $row['category']; ?></span></td>
-              <td><strong>$<?= number_format($row['price'], 2); ?></strong></td>
+              <td><strong>₦<?= number_format($row['price'], 2); ?></strong></td>
               <td>
                 <?php if ($row['stock'] > 10) { ?>
                   <span class="badge bg-success"><?= $row['stock']; ?> in stock</span>

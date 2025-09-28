@@ -45,16 +45,16 @@ while ($row = $items->fetch_assoc()) {
     $total += $subtotal;
 
     $pdf->Cell(80,10,$row['name'],1);
-    $pdf->Cell(30,10,"$".number_format($row['price'],2),1);
+    $pdf->Cell(30,10,"₦".number_format($row['price'],2),1);
     $pdf->Cell(30,10,$row['quantity'],1);
-    $pdf->Cell(40,10,"$".number_format($subtotal,2),1);
+    $pdf->Cell(40,10,"₦".number_format($subtotal,2),1);
     $pdf->Ln();
 }
 
 // Total
 $pdf->SetFont('Arial','B',12);
 $pdf->Cell(140,10,"Total",1);
-$pdf->Cell(40,10,"$".number_format($total,2),1);
+$pdf->Cell(40,10,"₦".number_format($total,2),1);
 $pdf->Ln(20);
 
 // Footer
