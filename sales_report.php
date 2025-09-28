@@ -25,12 +25,13 @@ if (isset($_GET['filter'])) {
 
 // Fetch sales
 $sales = $conn->query("
-    SELECT s.id, s.total, s.created_at, u.name AS cashier 
+    SELECT s.id, s.total, s.created_at, u.name, u.username
     FROM sales s 
     LEFT JOIN users u ON s.user_id = u.id 
     $where
     ORDER BY s.created_at DESC
 ");
+
 
 // Best-selling products
 $best_sellers = $conn->query("
@@ -139,7 +140,11 @@ $best_sellers = $conn->query("
           <?php while($row = $sales->fetch_assoc()) { ?>
             <tr>
               <td>#<?= $row['id']; ?></td>
-              <td><?= $row['cashier'] ?? "Unknown"; ?></td>
+              <td>
+  <strong><?= $row['username'] ?? "Unknown"; ?></strong><br>
+  <small class="text-muted"><?= $row['name'] ?? ""; ?></small>
+</td>
+
               <td><span class="badge bg-success">₦<?= number_format($row['total'], 2); ?></span></td>
               <td><?= date("d M Y, h:i A", strtotime($row['created_at'])); ?></td>
             </tr>

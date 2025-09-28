@@ -40,17 +40,19 @@ if (isset($_GET['remove'])) {
 }
 
 // Checkout (Save Sale)
+// Checkout (Save Sale)
 if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
     $total = 0;
     foreach ($_SESSION['cart'] as $item) {
         $total += $item['price'] * $item['quantity'];
     }
 
-    // Insert into sales
-    $conn->query("INSERT INTO sales (total, created_at, user_id) VALUES ($total, NOW(), 1)");
+    // Save sale with logged-in cashier
+    $user_id = $_SESSION['user_id'] ?? null;
+    $conn->query("INSERT INTO sales (total, user_id) VALUES ($total, " . ($user_id ? $user_id : "NULL") . ")");
     $sale_id = $conn->insert_id;
 
-    // Insert items
+    // Insert sale items
     foreach ($_SESSION['cart'] as $item) {
         $pid = $item['id'];
         $qty = $item['quantity'];
@@ -66,13 +68,14 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
     // Save sale_id for receipt
     $_SESSION['last_sale_id'] = $sale_id;
 
-    $_SESSION['cart'] = []; // clear cart
+    // Clear cart
+    $_SESSION['cart'] = [];
 
     // Redirect to receipt page
-    $success = "Sale completed successfully!";
     header("Location: receipt.php?id=" . $sale_id);
     exit;
 }
+$success = isset($_GET['success']) ? $_GET['success'] : '';
 
 ?>
 

@@ -18,12 +18,13 @@ $best_seller = $conn->query("
 
 // Recent sales
 $recent_sales = $conn->query("
-    SELECT s.id, s.total, s.created_at, u.name 
+    SELECT s.id, s.total, s.created_at, u.name, u.username
     FROM sales s
     LEFT JOIN users u ON s.user_id = u.id
     ORDER BY s.created_at DESC
     LIMIT 5
 ");
+
 
 // Low stock check (you can adjust the threshold, e.g., 5 items)
 $low_stock = $conn->query("SELECT name, stock FROM products WHERE stock < 5 ORDER BY stock ASC");
@@ -154,7 +155,11 @@ $low_stock = $conn->query("SELECT name, stock FROM products WHERE stock < 5 ORDE
                   <?php while($row = $recent_sales->fetch_assoc()) { ?>
                       <tr>
                           <td>#<?= $row['id']; ?></td>
-                          <td><?= $row['name'] ?? "Unknown"; ?></td>
+                          <td>
+  <strong><?= $row['username'] ?? "Unknown"; ?></strong>
+  <br><small class="text-muted"><?= $row['name'] ?? ""; ?></small>
+</td>
+
                           <td><span class="badge bg-success">₦<?= number_format($row['total'], 2); ?></span></td>
                           <td><?= date("d M Y, h:i A", strtotime($row['created_at'])); ?></td>
                       </tr>
