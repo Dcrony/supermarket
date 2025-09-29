@@ -1,13 +1,12 @@
 <?php
 session_start();
 include("includes/header.php");
-
 include("includes/db.php");
 
 // Fetch products
 $products = $conn->query("SELECT * FROM products ORDER BY name ASC");
 
-// Initialize cart if not exists
+// Initialize cart
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
@@ -17,17 +16,42 @@ if (isset($_POST['add_to_cart'])) {
     $id = $_POST['product_id'];
     $qty = $_POST['quantity'];
 
-    // Fetch product details
     $product = $conn->query("SELECT * FROM products WHERE id=$id")->fetch_assoc();
 
     if ($product && $qty > 0) {
-        $_SESSION['cart'][] = [
-            'id' => $product['id'],
-            'name' => $product['name'],
-            'price' => $product['price'],
-            'quantity' => $qty
-        ];
+        $found = false;
+
+        // If product already exists, update its quantity
+        foreach ($_SESSION['cart'] as &$cartItem) {
+            if ($cartItem['id'] == $id) {
+                $cartItem['quantity'] += $qty;
+                $found = true;
+                break;
+            }
+        }
+
+        // Otherwise add new
+        if (!$found) {
+            $_SESSION['cart'][] = [
+                'id' => $product['id'],
+                'name' => $product['name'],
+                'price' => $product['price'],
+                'quantity' => $qty
+            ];
+        }
     }
+}
+
+// Update cart quantities
+if (isset($_POST['update_cart'])) {
+    foreach ($_POST['quantities'] as $index => $newQty) {
+        if ($newQty > 0) {
+            $_SESSION['cart'][$index]['quantity'] = $newQty;
+        } else {
+            unset($_SESSION['cart'][$index]); // remove if qty <= 0
+        }
+    }
+    $_SESSION['cart'] = array_values($_SESSION['cart']); // reindex
 }
 
 // Remove from cart
@@ -39,20 +63,17 @@ if (isset($_GET['remove'])) {
     }
 }
 
-// Checkout (Save Sale)
-// Checkout (Save Sale)
+// Checkout
 if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
     $total = 0;
     foreach ($_SESSION['cart'] as $item) {
         $total += $item['price'] * $item['quantity'];
     }
 
-    // Save sale with logged-in cashier
     $user_id = $_SESSION['user_id'] ?? null;
     $conn->query("INSERT INTO sales (total, user_id) VALUES ($total, " . ($user_id ? $user_id : "NULL") . ")");
     $sale_id = $conn->insert_id;
 
-    // Insert sale items
     foreach ($_SESSION['cart'] as $item) {
         $pid = $item['id'];
         $qty = $item['quantity'];
@@ -60,23 +81,15 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
 
         $conn->query("INSERT INTO sale_items (sale_id, product_id, quantity, price) 
                       VALUES ($sale_id, $pid, $qty, $price)");
-
-        // Reduce stock
         $conn->query("UPDATE products SET stock = stock - $qty WHERE id=$pid");
     }
 
-    // Save sale_id for receipt
     $_SESSION['last_sale_id'] = $sale_id;
-
-    // Clear cart
     $_SESSION['cart'] = [];
 
-    // Redirect to receipt page
     header("Location: receipt.php?id=" . $sale_id);
     exit;
 }
-$success = isset($_GET['success']) ? $_GET['success'] : '';
-
 ?>
 
 <!DOCTYPE html>
@@ -86,14 +99,12 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
   <title>POS - Supermarket</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="">
+<body>
   <h2>Point of Sales (POS)</h2>
-
-  <?php if (!empty($success)) echo "<div class='alert alert-success'>$success</div>"; ?>
 
   <!-- Add to Cart -->
   <form method="POST" class="row g-3 mb-4 mt-4">
-    <div class=" col-md-6">
+    <div class="col-md-6">
       <label class="form-label">Product</label>
       <select name="product_id" class="form-control" required>
         <option value="">-- Select Product --</option>
@@ -108,14 +119,14 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
       <label class="form-label">Quantity</label>
       <input type="number" name="quantity" class="form-control" min="1" required>
     </div>
-    
     <div class="col-md-3 d-flex align-items-end">
       <button type="submit" name="add_to_cart" class="btn btn-primary w-100">Add to Cart</button>
     </div>
   </form>
 
   <!-- Cart Table -->
-  <h4>Cart</h4>
+<h4>Cart</h4>
+<form method="POST" id="cartForm">
   <table class="table table-bordered">
     <thead class="table-dark">
       <tr>
@@ -138,7 +149,11 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
           <td><?= $index + 1 ?></td>
           <td><?= $item['name'] ?></td>
           <td>₦<?= number_format($item['price'], 2) ?></td>
-          <td><?= $item['quantity'] ?></td>
+          <td>
+            <input type="number" name="quantities[<?= $index ?>]" 
+                   value="<?= $item['quantity'] ?>" min="1" 
+                   class="form-control qty-input" style="width:80px;">
+          </td>
           <td>₦<?= number_format($subtotal, 2) ?></td>
           <td>
             <a href="?remove=<?= $index ?>" class="btn btn-danger btn-sm">Remove</a>
@@ -152,16 +167,29 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
     </tbody>
   </table>
 
-  <form method="POST">
-    <button type="submit" name="checkout" class="btn btn-success">Checkout</button>
-    
-  </form>
+  <!-- Update button (hidden until quantity changes) -->
+  
+  <button type="submit" name="checkout" class="btn btn-success">Checkout</button>
+  <button type="submit" name="update_cart" id="updateBtn" class="btn btn-warning" style="display:none;">
+    Update Cart
+  </button>
+</form>
+
+<script>
+  // Show Update button only when quantity changes
+  document.querySelectorAll(".qty-input").forEach(input => {
+    input.addEventListener("change", () => {
+      document.getElementById("updateBtn").style.display = "inline-block";
+    });
+  });
+</script>
+
+
   <?php if (isset($_SESSION['last_sale_id'])) { ?>
     <a href="receipt.php?id=<?= $_SESSION['last_sale_id']; ?>" target="_blank" class="btn btn-info mt-3">
-        🧾 Print Last Receipt
+      🧾 Print Last Receipt
     </a>
-<?php } ?>
-
+  <?php } ?>
 </body>
 </html>
 
