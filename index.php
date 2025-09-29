@@ -16,32 +16,78 @@ if (isset($_SESSION['user_id'])) {
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       scroll-behavior: smooth;
+      background: #f9f9f9;
     }
+
+    /* Navbar */
+    .navbar {
+      transition: background 0.3s ease;
+    }
+    .navbar.scrolled {
+      background: rgba(0,0,0,0.9) !important;
+    }
+
+    /* Hero */
     .hero {
-      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('img/supermarket.jpg') center/cover no-repeat;
+      background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('img/supermarket.jpg') center/cover no-repeat;
       color: white;
       height: 100vh;
       display: flex;
       align-items: center;
       text-align: center;
+      animation: fadeIn 1.2s ease-in-out;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      animation: slideUp 1s ease-in-out;
+    }
+    .hero p {
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    /* Features */
+    .feature-card {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
     }
     .feature-icon {
       font-size: 2.5rem;
       color: #0d6efd;
+      margin-bottom: 15px;
+      animation: popIn 1.5s ease;
     }
+
+    /* CTA */
     .cta-section {
       background: #0d6efd;
       color: white;
-      padding: 60px 0;
+      padding: 80px 0;
+      animation: fadeInUp 1.2s ease-in-out;
     }
-    .navbar-dark .nav-link {
-      color: #f8f9fa !important;
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
     }
-    .navbar-dark .nav-link:hover {
-      color: #0d6efd !important;
-      background: #fff;
-      border-radius: 4px;
-      transition: 0.3s;
+    @keyframes slideUp {
+      from {transform: translateY(40px); opacity: 0;}
+      to {transform: translateY(0); opacity: 1;}
+    }
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(30px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    @keyframes popIn {
+      0% {transform: scale(0.7); opacity: 0;}
+      100% {transform: scale(1); opacity: 1;}
     }
   </style>
 </head>
@@ -67,9 +113,9 @@ if (isset($_SESSION['user_id'])) {
   <!-- Hero Section -->
   <section class="hero" id="hero">
     <div class="container">
-      <h1 class="display-4 fw-bold">Supermarket POS System</h1>
+      <h1 class="fw-bold">Supermarket POS System</h1>
       <p class="lead mb-4">Streamline sales, manage inventory, and boost productivity with our powerful Point of Sale software.</p>
-      <a href="login.php" class="btn btn-lg btn-primary">Get Started</a>
+      <a href="login.php" class="btn btn-lg btn-primary shadow">Get Started</a>
     </div>
   </section>
 
@@ -77,23 +123,29 @@ if (isset($_SESSION['user_id'])) {
   <section class="container my-5" id="features">
     <div class="text-center mb-5">
       <h2 class="fw-bold">Why Choose Our POS?</h2>
-      <p class="text-muted">Built for supermarkets, trusted by cashiers and admins.</p>
+      <p class="text-muted">Designed for supermarkets, trusted by cashiers and admins.</p>
     </div>
     <div class="row g-4">
-      <div class="col-md-4 text-center">
-        <div class="feature-icon mb-3">🛒</div>
-        <h5>Fast Checkout</h5>
-        <p>Reduce queues and process sales quickly with our intuitive interface.</p>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon">🛒</div>
+          <h5>Fast Checkout</h5>
+          <p>Process sales quickly and reduce queues with our simple, intuitive interface.</p>
+        </div>
       </div>
-      <div class="col-md-4 text-center">
-        <div class="feature-icon mb-3">📦</div>
-        <h5>Inventory Tracking</h5>
-        <p>Stay on top of stock with real-time product updates and alerts.</p>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon">📦</div>
+          <h5>Inventory Tracking</h5>
+          <p>Monitor stock levels in real-time and get alerts when products run low.</p>
+        </div>
       </div>
-      <div class="col-md-4 text-center">
-        <div class="feature-icon mb-3">📊</div>
-        <h5>Smart Reports</h5>
-        <p>Access detailed sales reports and insights anytime, anywhere.</p>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon">📊</div>
+          <h5>Smart Reports</h5>
+          <p>Access detailed sales reports and insights anytime to grow your business.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -103,7 +155,7 @@ if (isset($_SESSION['user_id'])) {
     <div class="container">
       <h2 class="fw-bold">Ready to Transform Your Supermarket?</h2>
       <p class="mb-4">Sign in and start managing sales and inventory like a pro.</p>
-      <a href="login.php" class="btn btn-light btn-lg">Login to Dashboard</a>
+      <a href="login.php" class="btn btn-light btn-lg shadow">Login to Dashboard</a>
     </div>
   </section>
 
@@ -113,5 +165,12 @@ if (isset($_SESSION['user_id'])) {
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Navbar background change on scroll
+    window.addEventListener('scroll', function() {
+      const nav = document.querySelector('.navbar');
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    });
+  </script>
 </body>
 </html>
