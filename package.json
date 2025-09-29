@@ -1,4 +1,11 @@
+
 {
+ "scripts": {
+  "start": "node index.js",
+  "build": "echo 'Build step not required for PHP project'"
+}
+
+  ,
   "dependencies": {
     "bootstrap": "^5.3.8"
   }
