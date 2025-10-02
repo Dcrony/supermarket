@@ -19,7 +19,8 @@ if (isset($_SESSION['user_id'])) {
       background: #f9f9f9;
     }
 
-    /* Navbar */
+    /* Navbar*/
+    
     .navbar {
       transition: background 0.3s ease;
     }
