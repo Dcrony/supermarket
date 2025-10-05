@@ -30,7 +30,7 @@ if (isset($_SESSION['user_id'])) {
 
     /* Hero */
     .hero {
-      background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('uploads/img/down.jpg') center/cover no-repeat;
+      background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('assets/img/down.jpg') center/cover no-repeat;
       color: white;
       height: 100vh;
       display: flex;

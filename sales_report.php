@@ -118,7 +118,10 @@ $best_sellers = $conn->query("
   <!-- EXPORT BUTTONS -->
   <div class="d-flex gap-2 mb-3">
     <a href="export_pdf.php?filter=<?= $_GET['filter'] ?? '' ?>&start_date=<?= $_GET['start_date'] ?? '' ?>&end_date=<?= $_GET['end_date'] ?? '' ?>" 
-       class="btn btn-danger"><i class="bi bi-file-earmark-pdf me-1"></i> Export to PDF</a>
+   target="_blank" class="btn btn-success">
+   <i class="bi bi-printer me-1"></i> Print Report
+</a>
+
   </div>
 
   <!-- SALES TABLE -->

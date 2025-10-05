@@ -1,71 +1,173 @@
 <?php
-require("includes/db.php");
-require("includes/fpdf/fpdf.php");
+session_start();
+include("includes/db.php");
 
-// Create PDF
-$pdf = new FPDF();
-$pdf->AddPage();
-$pdf->SetFont("Arial", "B", 16);
+// Handle filters like in sales.php
+$where = "";
 
-// Title
-$pdf->Cell(0, 10, "Sales Report", 0, 1, "C");
-$pdf->Ln(5);
+if (isset($_GET['filter'])) {
+    $filter = $_GET['filter'];
 
-// =====================
-// Sales Transactions
-// =====================
-$pdf->SetFont("Arial", "B", 12);
-$pdf->Cell(20, 10, "ID", 1);
-$pdf->Cell(50, 10, "Cashier", 1);
-$pdf->Cell(40, 10, "Total", 1);
-$pdf->Cell(60, 10, "Date", 1);
-$pdf->Ln();
+    if ($filter == "today") {
+        $where = "WHERE DATE(s.created_at) = CURDATE()";
+    } elseif ($filter == "week") {
+        $where = "WHERE YEARWEEK(s.created_at, 1) = YEARWEEK(CURDATE(), 1)";
+    } elseif ($filter == "month") {
+        $where = "WHERE MONTH(s.created_at) = MONTH(CURDATE()) AND YEAR(s.created_at) = YEAR(CURDATE())";
+    } elseif ($filter == "custom" && !empty($_GET['start_date']) && !empty($_GET['end_date'])) {
+        $start = $conn->real_escape_string($_GET['start_date']);
+        $end = $conn->real_escape_string($_GET['end_date']);
+        $where = "WHERE DATE(s.created_at) BETWEEN '$start' AND '$end'";
+    }
+}
 
-$pdf->SetFont("Arial", "", 11);
+// Fetch sales
 $sales = $conn->query("
-    SELECT s.id, s.total, s.created_at, u.username AS cashier 
-    FROM sales s 
-    LEFT JOIN users u ON s.user_id = u.id 
+    SELECT s.id, s.total, s.created_at, u.name, u.username
+    FROM sales s
+    LEFT JOIN users u ON s.user_id = u.id
+    $where
     ORDER BY s.created_at DESC
 ");
 
-while ($row = $sales->fetch_assoc()) {
-    $pdf->Cell(20, 10, $row['id'], 1);
-    $pdf->Cell(50, 10, $row['cashier'] ?? "Unknown", 1);
-    $pdf->Cell(40, 10, "₦" . number_format($row['total'], 2), 1);
-    $pdf->Cell(60, 10, $row['created_at'], 1);
-    $pdf->Ln();
-}
-
-// =====================
-// Best-Selling Products
-// =====================
-$pdf->Ln(10);
-$pdf->SetFont("Arial", "B", 14);
-$pdf->Cell(0, 10, "Best Selling Products", 0, 1, "C");
-$pdf->Ln(5);
-
-$pdf->SetFont("Arial", "B", 12);
-$pdf->Cell(90, 10, "Product", 1);
-$pdf->Cell(40, 10, "Quantity Sold", 1);
-$pdf->Ln();
-
-$pdf->SetFont("Arial", "", 11);
+// Best sellers
 $best_sellers = $conn->query("
-    SELECT p.name, SUM(si.quantity) as total_sold 
-    FROM sale_items si 
-    JOIN products p ON si.product_id = p.id 
-    GROUP BY si.product_id 
-    ORDER BY total_sold DESC 
+    SELECT p.name, SUM(si.quantity) AS total_sold
+    FROM sale_items si
+    JOIN products p ON si.product_id = p.id
+    JOIN sales s ON si.sale_id = s.id
+    $where
+    GROUP BY si.product_id
+    ORDER BY total_sold DESC
     LIMIT 5
 ");
-
-while ($row = $best_sellers->fetch_assoc()) {
-    $pdf->Cell(90, 10, $row['name'], 1);
-    $pdf->Cell(40, 10, $row['total_sold'], 1);
-    $pdf->Ln();
-}
-
-// Output PDF to browser
-$pdf->Output("I", "sales_report.pdf");
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Printable Sales Report</title>
+<style>
+    body {
+        font-family: 'Courier New', monospace;
+        background: #fff;
+        color: #000;
+        margin: 40px;
+    }
+    h2, h3 {
+        text-align: center;
+        margin: 0;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+    th, td {
+        border-bottom: 1px dashed #aaa;
+        padding: 6px 4px;
+        font-size: 0.9rem;
+    }
+    th {
+        text-align: left;
+        background: #f2f2f2;
+    }
+    .section {
+        margin-top: 30px;
+    }
+    .footer {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 0.8rem;
+    }
+    @media print {
+        .print-btn {
+            display: none;
+        }
+        body {
+            margin: 10px;
+        }
+    }
+    .print-btn {
+        display: block;
+        margin: 20px auto;
+        background: #198754;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<h2>🧾 Supermarket POS System</h2>
+<h3>Sales Report</h3>
+<p style="text-align:center; font-size:0.9rem;">
+    Generated on <?= date("d M Y, h:i A"); ?>
+</p>
+<hr>
+
+<div class="section">
+    <h4>All Sales Transactions</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cashier</th>
+                <th>Total (₦)</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            $grand_total = 0;
+            while ($row = $sales->fetch_assoc()) { 
+                $grand_total += $row['total'];
+            ?>
+            <tr>
+                <td>#<?= $row['id']; ?></td>
+                <td><?= htmlspecialchars($row['username'] ?? "Unknown"); ?></td>
+                <td><?= number_format($row['total'], 2); ?></td>
+                <td><?= date("d M Y, h:i A", strtotime($row['created_at'])); ?></td>
+            </tr>
+            <?php } ?>
+            <tr>
+                <td colspan="2"><strong>Total Revenue:</strong></td>
+                <td colspan="2"><strong>₦<?= number_format($grand_total, 2); ?></strong></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="section">
+    <h4>Best Selling Products</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity Sold</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while($row = $best_sellers->fetch_assoc()) { ?>
+            <tr>
+                <td><?= htmlspecialchars($row['name']); ?></td>
+                <td><?= $row['total_sold']; ?></td>
+            </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <hr>
+    <p>Generated by Supermarket POS</p>
+    <p><?= date("Y"); ?> &copy; All Rights Reserved</p>
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ Print Report</button>
+
+</body>
+</html>
