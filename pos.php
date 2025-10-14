@@ -87,11 +87,37 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>POS - Supermarket</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Select2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+  <!-- jQuery (required by Select2) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Select2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+  <style>
+    .select2-container--bootstrap-5 .select2-selection {
+      height: calc(2.5rem + 2px);
+      padding: 0.375rem 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      background-color: #fff;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection__arrow {
+      height: 2.5rem;
+    }
+  </style>
+
+
 </head>
+
 <body class="container mt-4">
   <h2>Point of Sales (POS)</h2>
 
@@ -99,23 +125,33 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
   <form method="POST" class="row g-3 mb-4 mt-4">
     <div class="col-md-6">
       <label class="form-label">Product</label>
-      <select name="product_id" class="form-control" required>
-        <option value="">-- Select Product --</option>
-        <?php
-        $products->data_seek(0);
-        while ($row = $products->fetch_assoc()) { ?>
-          <option value="<?= $row['id'] ?>"><?= $row['name'] ?> (₦<?= $row['price'] ?>)</option>
-        <?php } ?>
-      </select>
+
+     <select name="product_id" id="productSelect" class="form-control" required>
+    <option value="">-- Select Product --</option>
+    <?php
+    $products->data_seek(0);
+    while ($row = $products->fetch_assoc()) { ?>
+      <option value="<?= $row['id'] ?>">
+        <?= htmlspecialchars($row['name']) ?> (₦<?= number_format($row['price']) ?>)
+      </option>
+    <?php } ?>
+  </select>
+
+     
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Quantity</label>
       <input type="number" name="quantity" class="form-control" min="1" required>
     </div>
+
     <div class="col-md-3 d-flex align-items-end">
       <button type="submit" name="add_to_cart" class="btn btn-primary w-100">Add to Cart</button>
     </div>
   </form>
+
+
+
 
   <!-- Cart Table -->
   <h4>Cart</h4>
@@ -144,7 +180,7 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
             <td>₦<?= number_format($item['price'], 2) ?></td>
             <td>
               <input type="number" name="quantities[<?= $index ?>]" value="<?= $item['quantity'] ?>"
-                     min="1" class="form-control qty-input" style="width:80px;">
+                min="1" class="form-control qty-input" style="width:80px;">
             </td>
             <td>₦<?= number_format($subtotal, 2) ?></td>
             <td>
@@ -169,6 +205,20 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
     </div>
   </form>
 
+
+  <script>
+    $(document).ready(function() {
+      $('#productSelect').select2({
+        placeholder: "-- Select Product --",
+        allowClear: true,
+        width: '100%',
+        theme: 'bootstrap-5',
+        minimumResultsForSearch: 0 // Always show search bar
+      });
+    });
+  </script>
+
+
   <script>
     // Show Update button only when quantity changes
     document.querySelectorAll(".qty-input").forEach(input => {
@@ -184,6 +234,7 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
     </a>
   <?php } ?>
 </body>
+
 </html>
 
 <?php include("includes/footer.php"); ?>
