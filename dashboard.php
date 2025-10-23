@@ -16,14 +16,25 @@ $best_seller = $conn->query("
     LIMIT 1
 ")->fetch_assoc();
 
-// Recent sales
+// Recent sales (including cashier, products, and quantity)
 $recent_sales = $conn->query("
-    SELECT s.id, s.total, s.created_at, u.name, u.username
+    SELECT 
+        s.id AS sale_id, 
+        s.total, 
+        s.created_at, 
+        u.name AS cashier_name, 
+        u.username,
+        GROUP_CONCAT(CONCAT(p.name, ' (', si.quantity, ')') SEPARATOR ', ') AS items_sold,
+        SUM(si.quantity) AS total_quantity
     FROM sales s
     LEFT JOIN users u ON s.user_id = u.id
+    LEFT JOIN sale_items si ON s.id = si.sale_id
+    LEFT JOIN products p ON si.product_id = p.id
+    GROUP BY s.id
     ORDER BY s.created_at DESC
     LIMIT 5
 ");
+
 
 
 // Low stock check (you can adjust the threshold, e.g., 5 items)
@@ -144,27 +155,31 @@ $low_stock = $conn->query("SELECT name, stock FROM products WHERE stock < 5 ORDE
       <div class="card-body">
           <table class="table table-hover align-middle">
               <thead>
-                  <tr>
-                      <th>Sale ID</th>
-                      <th>Cashier</th>
-                      <th>Total</th>
-                      <th>Date</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <?php while($row = $recent_sales->fetch_assoc()) { ?>
-                      <tr>
-                          <td>#<?= $row['id']; ?></td>
-                          <td>
-  <strong><?= $row['username'] ?? "Unknown"; ?></strong>
-  <br><small class="text-muted"><?= $row['name'] ?? ""; ?></small>
-</td>
+    <tr>
+        <th>Sale ID</th>
+        <th>Cashier</th>
+        <th>Items Sold</th>
+        <th>Total Quantity</th>
+        <th>Total</th>
+        <th>Date</th>
+    </tr>
+</thead>
+<tbody>
+    <?php while($row = $recent_sales->fetch_assoc()) { ?>
+        <tr>
+            <td>#<?= $row['sale_id']; ?></td>
+            <td>
+                <strong><?= $row['username'] ?? "Unknown"; ?></strong><br>
+                <small class="text-muted"><?= $row['cashier_name'] ?? ""; ?></small>
+            </td>
+            <td><?= $row['items_sold'] ?? 'N/A'; ?></td>
+            <td><?= $row['total_quantity'] ?? 0; ?></td>
+            <td><span class="badge bg-success">₦<?= number_format($row['total'], 2); ?></span></td>
+            <td><?= date("d M Y, h:i A", strtotime($row['created_at'])); ?></td>
+        </tr>
+    <?php } ?>
+</tbody>
 
-                          <td><span class="badge bg-success">₦<?= number_format($row['total'], 2); ?></span></td>
-                          <td><?= date("d M Y, h:i A", strtotime($row['created_at'])); ?></td>
-                      </tr>
-                  <?php } ?>
-              </tbody>
           </table>
       </div>
   </div>

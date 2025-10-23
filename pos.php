@@ -103,7 +103,7 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
 
   <style>
     .select2-container--bootstrap-5 .select2-selection {
-      height: calc(2.5rem + 2px);
+      height: calc(2.3rem + 2px);
       padding: 0.375rem 0.75rem;
       border: 1px solid #ced4da;
       border-radius: 0.375rem;
@@ -111,7 +111,7 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
     }
 
     .select2-container--bootstrap-5 .select2-selection__arrow {
-      height: 2.5rem;
+      height: 1rem;
     }
   </style>
 
@@ -127,14 +127,16 @@ if (isset($_POST['checkout']) && !empty($_SESSION['cart'])) {
       <label class="form-label">Product</label>
 
      <select name="product_id" id="productSelect" class="form-control" required>
-    <option value="">-- Select Product --</option>
-    <?php
+    <option value="">-- Select Product --
+      <?php
     $products->data_seek(0);
     while ($row = $products->fetch_assoc()) { ?>
       <option value="<?= $row['id'] ?>">
         <?= htmlspecialchars($row['name']) ?> (₦<?= number_format($row['price']) ?>)
       </option>
     <?php } ?>
+    </option>
+    
   </select>
 
      

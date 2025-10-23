@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
@@ -7,9 +7,22 @@ if (!isset($_SESSION['user_id'])) {
 include("includes/header.php");
 include("includes/db.php");
 
-// Fetch products
-$result = $conn->query("SELECT * FROM products ORDER BY id DESC");
+// Handle search
+$search = "";
+if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
+    $search = $conn->real_escape_string(trim($_GET['search']));
+    $query = "SELECT * FROM products 
+              WHERE name LIKE '%$search%' 
+              OR category LIKE '%$search%' 
+              OR id LIKE '%$search%'
+              ORDER BY id DESC";
+} else {
+    $query = "SELECT * FROM products ORDER BY id DESC";
+}
+
+$result = $conn->query($query);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -52,9 +65,12 @@ $result = $conn->query("SELECT * FROM products ORDER BY id DESC");
   <!-- SEARCH BAR -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <form method="GET" class="d-flex search-bar">
-      <input type="text" name="search" class="form-control me-2" placeholder="Search products...">
-      <button class="btn btn-primary"><i class="bi bi-search"></i></button>
-    </form>
+  <input type="text" name="search" class="form-control me-2" 
+         placeholder="Search products..." 
+         value="<?= htmlspecialchars($search); ?>">
+  <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+</form>
+
   </div>
 
   <!-- PRODUCTS TABLE -->
